@@ -15,6 +15,7 @@ message RegisterHandlerRequest {
 }
 
 message RegisterHandlerResponse {
- 
+  bool Success = 1;
+  string Error = 2;
 }
 

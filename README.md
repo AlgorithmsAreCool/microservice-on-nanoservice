@@ -37,11 +37,22 @@ i'll implement custom dispatching from there.
 
 I'm going to lead the gRPC server and then add the data plane hooking later
 
-```
+```powershell
 dotnet new gRPC
 ```
+
 and then some fixups to define the control-plane interface
 
 ## 2. Bring in Orleans
 
 Now lets bring in Orleans and get the silo running. I'm going to use the in-memory storage provider for demo purposes.
+
+## 3. Scaffold the control-plane implementation
+
+Ok, so now i need to figure out how to register a route and deploy  the javascript to the silo. I
+
+So in Orleans, we start be defining a grain interface that will store the javascript and metadata.
+Since we said that the first route segment would be the "family" of routes, we'll use that as the grain key.
+For now, we will not support storing multiple versions of the route handler. But maybe we'll add that later.
+
+I've also left a method to validate the javascript before import, because why let your users push broken code?
