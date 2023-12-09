@@ -41,3 +41,7 @@ I'm going to lead the gRPC server and then add the data plane hooking later
 dotnet new gRPC
 ```
 and then some fixups to define the control-plane interface
+
+## 2. Bring in Orleans
+
+Now lets bring in Orleans and get the silo running. I'm going to use the in-memory storage provider for demo purposes.
