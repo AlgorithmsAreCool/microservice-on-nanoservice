@@ -28,3 +28,16 @@ function to the "foo" family, then it will handle all requests to /foo/*.
 I'm skipping authentication and authorization for because move fast and break things.
 
 Chat GPT suggests the name "CosmoCompute" for this project. I like it.
+
+## 1. Setup the project
+
+I'm going to use gRPC for the control-plane because it is easier than REST and I'm lazy.
+The data-plane of course is defined by the custom routing, so it will only need a single hook and then
+i'll implement custom dispatching from there.
+
+I'm going to lead the gRPC server and then add the data plane hooking later
+
+```
+dotnet new gRPC
+```
+and then some fixups to define the control-plane interface

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "CosmosCompute";
+
+package greet;
+
+service ControlPlane {
+  rpc RegisterHandler (RegisterHandlerRequest) returns (RegisterHandlerResponse) {}
+}
+
+message RegisterHandlerRequest {
+  string handler_id = 1;
+  string handler_route = 2;
+  string handler_js_body = 3;
+}
+
+message RegisterHandlerResponse {
+ 
+}
+
