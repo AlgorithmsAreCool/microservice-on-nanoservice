@@ -56,3 +56,19 @@ Since we said that the first route segment would be the "family" of routes, we'l
 For now, we will not support storing multiple versions of the route handler. But maybe we'll add that later.
 
 I've also left a method to validate the javascript before import, because why let your users push broken code?
+
+## 4. Implement the control-plane and bring in the javascript runtime
+
+Alright lets get to the meat. We have 2 basic choices Jint or Clearscript.
+I'm going to go with Jint because it is pure C# and gives me some nice features i want for later.
+
+But before we get to that, we are using the underlying Esprima parser to validate the javascript. 
+
+This is also a good time to add some tests!
+Testing is a strong point of the Orleans framework, but more on that later. For now, lets just make sure we can
+deploy some javascript to the grain;
+
+We run `dotnet new xunit` to get the test project and then add a reference to the core project with
+`dotnet add reference ../CosmoCompute/CosmoCompute.csproj`
+
+Fun fact, CoPilot inferred the entire test class just from the name! But it had a small bug that i fixed up and now they are green!😀

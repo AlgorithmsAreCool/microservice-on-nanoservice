@@ -1,21 +1,24 @@
 using Orleans.Runtime;
+using Jint;
 
 namespace CosmosCompute.Services;
 
-public class JavascriptGrain(IPersistentState<JavascriptGrain.JavascriptGrainState> state) : Grain, IJavascriptGrain
+public class JavascriptGrain(IPersistentState<JavascriptGrain.JavascriptGrainState?> state) : Grain, IJavascriptGrain
 {
     public async Task Import(string code)
     {
-        if (!TryParseJavascript(code, out var error))
-            throw new ArgumentException(error);
+        EnsureJavascriptParsers(code);
 
+        state.State ??= new JavascriptGrainState();
         state.State.Code = code;
-        await state.WriteStateAsync();
+
+        await state.WriteStateAsync();//save to storage
     }
 
-    private static bool TryParseJavascript(string code, out string? error)
+    private static void EnsureJavascriptParsers(string code)
     {
-        
+        var parser = new Esprima.JavaScriptParser();
+        _ = parser.ParseScript(code, strict: true);//let it throw
     }
 
     public class JavascriptGrainState

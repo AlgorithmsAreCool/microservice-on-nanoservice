@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosCompute", "CosmosCompute\CosmosCompute.csproj", "{C845739D-A711-4117-86CD-3CE748EB07F3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosCompute.Tests", "CosmosCompute.Tests\CosmosCompute.Tests.csproj", "{744D5D58-27EC-41A2-932D-FF8F488DFC12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C845739D-A711-4117-86CD-3CE748EB07F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C845739D-A711-4117-86CD-3CE748EB07F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C845739D-A711-4117-86CD-3CE748EB07F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
