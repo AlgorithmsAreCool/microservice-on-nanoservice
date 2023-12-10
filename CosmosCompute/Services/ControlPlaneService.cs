@@ -11,10 +11,7 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
     /// </summary>
     public override async Task<RegisterHandlerResponse> RegisterHandler(RegisterHandlerRequest request, ServerCallContext context)
     {
-        //slow, but simple
-        var containsInvalidCharacters = request.HandlerId.Any(c => !char.IsLetterOrDigit(c) && c != '-');
-
-        if (containsInvalidCharacters)
+        if (Helpers.IsValidHandlerId(request.HandlerId) is false)
         {
             return new RegisterHandlerResponse {
                 Success = false,
@@ -22,7 +19,7 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
             };
         }
 
-        var normalizedHandlerName = request.HandlerId.ToLowerInvariant();
+        var normalizedHandlerName = Helpers.GetNormalizedHandlerName(request.HandlerId);
 
         var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedHandlerName);
 

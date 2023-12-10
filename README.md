@@ -72,3 +72,24 @@ We run `dotnet new xunit` to get the test project and then add a reference to th
 `dotnet add reference ../CosmoCompute/CosmoCompute.csproj`
 
 Fun fact, CoPilot inferred the entire test class just from the name! But it had a small bug that i fixed up and now they are green!😀
+
+## 4.5 MORE TESTS!
+
+I'm going to bring in some more testing infrastructure just for fun. Orleans provides a testing framework
+that lets you run an entire cluster (multiple silos!) in memory. This is great for testing because it lets you
+get some deep realism in your tests. 
+
+## 5. Bring in the data-plane
+
+Now we need to implement the data-plane. This is the part that will handle the requests from the web.
+There are a couple of parts to this:
+
+1. Add plumbing to the JavascriptGrain to handle the requests
+2. dynamically configure the routing to point to the grain
+
+
+So, we are going to create an abstraction to link up the route to the grain. 
+Then we add some smarts to the grain to execute the javascript and return the result.
+For the moment, we are only going to support GET requests and only allow the script to return plain strings.
+
+Now, one of the downsides to ASP.NET minimal APIs is that it impedes unit testing :/, so maybe we'll deal with that later.

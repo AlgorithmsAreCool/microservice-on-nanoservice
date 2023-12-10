@@ -1,5 +1,6 @@
 using CosmosCompute;
 using CosmosCompute.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +18,11 @@ var app = builder.Build();
 app.MapGrpcService<ControlPlaneService>();
 
 
-app.MapGet("/app/{client}/{**rest}", (string client, string rest) =>
+app.MapGet("/app/{client}/{**rest}",  async (DataPlaneRouterService routerService, string client, string rest) =>
 {
- return $"Hello World! ({client}) {rest}";
+    var evalResult = await routerService.DispatchRoute(client, rest);
+
+    return Results.Text(evalResult.Body, statusCode: (int)evalResult.StatusCode);
 });
 
 
