@@ -10,6 +10,40 @@ using Orleans.Runtime;
 public class JavascriptGrainTests
 {
     [Fact]
+    public async Task CanExecuteFetch()
+    {
+        //Arrange
+        var code = "fetch('https://example.org/')";
+        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
+        var grain = new JavascriptGrain(state);
+
+        //Act
+        await grain.Import(code);
+        var result = await grain.Execute("test");
+
+        //Assert
+        Assert.Equal(code, state.State?.Code);
+        Assert.Null(result.Body);
+    }
+
+    [Fact]
+    public async Task CanExecuteExpression()
+    {
+        //Arrange
+        var code = "2 * 2";
+        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
+        var grain = new JavascriptGrain(state);
+
+        //Act
+        await grain.Import(code);
+        var result = await grain.Execute("test");
+
+        //Assert
+        Assert.Equal(code, state.State?.Code);
+        Assert.Null(result.Body);
+    }
+
+    [Fact]
     public async Task Import_WhenCodeIsValid_ImportsCode()
     {
         //Arrange
@@ -37,9 +71,9 @@ public class JavascriptGrainTests
     }
 }
 
-public class MockStorage<T> : IPersistentState<T>
+public class MockStorage<T> : IPersistentState<T?>
 {
-    public T State { get; set; }
+    public T? State { get; set; }
     public string? Etag { get; }
     public bool RecordExists { get; private set; }
 

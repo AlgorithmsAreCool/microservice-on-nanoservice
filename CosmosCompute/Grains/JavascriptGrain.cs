@@ -60,6 +60,10 @@ public class JavascriptGrain([PersistentState("state")]  IPersistentState<Javasc
 
             using var engine = new Engine();
             engine.SetValue("path", path);
+            engine.SetValue("fetch", (string resource) => {
+                using var client = new HttpClient();
+                return client.GetStringAsync(resource).Result;
+            });
 
             var result = engine.Evaluate(state.State.Code);
 

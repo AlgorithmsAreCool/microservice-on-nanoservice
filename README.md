@@ -93,3 +93,12 @@ Then we add some smarts to the grain to execute the javascript and return the re
 For the moment, we are only going to support GET requests and only allow the script to return plain strings.
 
 Now, one of the downsides to ASP.NET minimal APIs is that it impedes unit testing :/, so maybe we'll deal with that later.
+
+## 6. Adding a fetch API
+
+Being able to run javascript is cool, but it's not very useful without any APIs to help you do stuff. So lets add a fetch API.
+
+Now, i'm not an expert on how to work with Jint, so i might be doing this wrong, but lets give it a shot.
+
+The plan is to inject a fetch function into the javascript runtime. We'll use the `System.Net.Http.HttpClient` to do the actual work.
+Unbelievably, this works! I was expecting to have to do some crazy stuff, but it just works! Jint is really cool!
