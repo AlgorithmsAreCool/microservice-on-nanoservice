@@ -141,4 +141,20 @@ Mean Latency: 0.206
 Real Average: 38,095.11
 ```
 
-Not bad! Sub-millisecond latency and 38k requests per second on my laptop! I'm pretty happy with that.
+Not bad! End to End Sub-millisecond latency and 38k requests per second on my laptop! Memory usage topped out at 40MB
+I'm sure we can do better, but this is a good start.
+
+# 9. Where we ended up
+
+So we have a working prototype of a serverless system built on top of Orleans. It's is far from production ready
+but it can to quite a bit already and it can do it pretty fast! After adding some things like telemetry, auth, 
+execution quotas, etc this could actually be deployed as an internal facing system! I wouldn't put it on the 
+public internet until i better understand Jint's Security model however 😅.
+
+Orleans is a beautiful thing to work with. It is so easy to build a prototype like this and take it all the way to production.
+With the code as-is exact same code with no modifications could be deployed to a cluster of machines and it would just work! 
+I didn't have to worry about how to scale out to multiple machines, or how to handle concurrency, or how to load data from storage,
+or how to evict cold data from memory. All of that is handled by Orleans.
+
+
+This has been a very fun weekend project! I hope you enjoyed reading about it as much as I enjoyed building it!
