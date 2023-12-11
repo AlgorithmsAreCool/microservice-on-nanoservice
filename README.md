@@ -115,7 +115,7 @@ Whats neat about this is that the memory consumption can be lower than 1MB for s
 So consumption time is to the microsecond and the memory is measured accurate to the byte! Just for fun. Future work could be to add
 a sampling profiler to the runtime to get a better idea of the memory usage over the time of the request.
 
-# 8. Building a Test App and measuring performance
+## 8. Building a Test App and measuring performance
 
 So at this point the proof of concept is done. It's time to build a test app to see how it performs.
 To do this, I need to move out the protobuf definitions into a shared project so that the test app can use them.
@@ -144,7 +144,7 @@ Real Average: 38,095.11
 Not bad! End to End Sub-millisecond latency and 38k requests per second on my laptop! Memory usage topped out at 40MB
 I'm sure we can do better, but this is a good start.
 
-# 9. Where we ended up
+## 9. Where we ended up
 
 So we have a working prototype of a serverless system built on top of Orleans. It's is far from production ready
 but it can to quite a bit already and it can do it pretty fast! After adding some things like telemetry, auth, 
