@@ -1,15 +1,18 @@
 using CosmosCompute;
 using CosmosCompute.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseOrleans(siloBuilder => {
     siloBuilder.UseLocalhostClustering();
+    siloBuilder.AddMemoryGrainStorageAsDefault();
 });
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<DataPlaneRouterService>();
 
 var app = builder.Build();
 
@@ -18,8 +21,7 @@ var app = builder.Build();
 app.MapGrpcService<ControlPlaneService>();
 
 
-app.MapGet("/app/{client}/{**rest}",  async (DataPlaneRouterService routerService, string client, string rest) =>
-{
+app.MapGet("/app/{client}/{**rest}", async ([FromServices] DataPlaneRouterService routerService, string client, string rest) => {
     var evalResult = await routerService.DispatchRoute(client, rest);
 
     return Results.Text(evalResult.Body, statusCode: (int)evalResult.StatusCode);

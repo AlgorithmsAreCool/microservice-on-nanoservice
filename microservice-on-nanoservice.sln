@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosCompute", "CosmosComp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosCompute.Tests", "CosmosCompute.Tests\CosmosCompute.Tests.csproj", "{744D5D58-27EC-41A2-932D-FF8F488DFC12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosCompute.Core", "CosmosCompute.Core\CosmosCompute.Core.csproj", "{8EDCB6CA-EE98-414F-B40A-14942CBBF889}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosCompute.LoadGenerator", "CosmosCompute.LoadGenerator\CosmosCompute.LoadGenerator.csproj", "{0F58488B-8102-4AB8-9520-3CEE7A26EC8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{744D5D58-27EC-41A2-932D-FF8F488DFC12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EDCB6CA-EE98-414F-B40A-14942CBBF889}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EDCB6CA-EE98-414F-B40A-14942CBBF889}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EDCB6CA-EE98-414F-B40A-14942CBBF889}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EDCB6CA-EE98-414F-B40A-14942CBBF889}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F58488B-8102-4AB8-9520-3CEE7A26EC8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F58488B-8102-4AB8-9520-3CEE7A26EC8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F58488B-8102-4AB8-9520-3CEE7A26EC8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F58488B-8102-4AB8-9520-3CEE7A26EC8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

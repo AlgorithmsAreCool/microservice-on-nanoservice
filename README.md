@@ -114,3 +114,31 @@ specialized storage solutions, so we'll leave that for later.
 Whats neat about this is that the memory consumption can be lower than 1MB for simple scripts and the execution time can be less than 1ms
 So consumption time is to the microsecond and the memory is measured accurate to the byte! Just for fun. Future work could be to add
 a sampling profiler to the runtime to get a better idea of the memory usage over the time of the request.
+
+# 8. Building a Test App and measuring performance
+
+So at this point the proof of concept is done. It's time to build a test app to see how it performs.
+To do this, I need to move out the protobuf definitions into a shared project so that the test app can use them.
+
+It also turns out that i had a couple little missing bits needed to run the server correctly 😅.
+The test app is a simple "hello world" app that just returns a string. It's not very realistic, but it's a start.
+
+So how did we do?
+
+```
+====================================
+Thread Count: 1 Requests Per Thread: 10000
+Total: 10000 Errors: 0 Subjective Time: 2.575 Real Time: 2.576
+Subjective Average: 3,884.03
+Mean Latency: 0.257
+Real Average: 3,881.79
+...
+====================================
+Thread Count: 8 Requests Per Thread: 10000
+Total: 80000 Errors: 0 Subjective Time: 16.519 Real Time: 2.100
+Subjective Average: 4,842.97
+Mean Latency: 0.206
+Real Average: 38,095.11
+```
+
+Not bad! Sub-millisecond latency and 38k requests per second on my laptop! I'm pretty happy with that.
