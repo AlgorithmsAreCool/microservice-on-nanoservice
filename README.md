@@ -1,10 +1,21 @@
 # microservice-on-nanoservice
 A quick hack to build a microservice system on top of Microsoft Orleans 
 
-# Intro
+# What is this thing?
 
-I was writing some documentation and I had a bad idea! I often describe Orleans as a "nanoservice" framework because it's unit of abstraction is single c# interface.
-Then I thought, what if I could build a serverless system on top of Orleans? So I did!
+This is a proof of concept of a serverless system built on top of Orleans. It does a few things:
+- Allows you to deploy javascript functions to respond to HTTP requests
+- Transparently loads handler scripts from storage on demand and caches their parsed AST in memory 
+- Automatically unloads cold scripts from memory
+- Captures basic consumption metrics for each script
+- Exposes a gRPC control-plane to deploy javascript functions and specify the routes they handle
+- Exposes a data-plane to dispatch requests to the correct javascript functions
+
+# But why?
+I was writing some documentation at a cafe one day, and I  described Orleans as a "nanoservice" framework as i 
+often do to newcomers because it's unit of abstraction is single C# interface. Then I thought, since a nanoservice
+might be a primitive building block of a microservice, could i build a microservice/serverless system on top of it? 
+The answer is yes. Yes I can.
 
 # Live blog of development
 
