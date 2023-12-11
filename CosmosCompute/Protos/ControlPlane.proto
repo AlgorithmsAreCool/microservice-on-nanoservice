@@ -5,8 +5,34 @@ option csharp_namespace = "CosmosCompute";
 package greet;
 
 service ControlPlane {
+  rpc QueryUsage (QueryConsumptionRequest) returns (QueryConsumptionResponse) {}
   rpc RegisterHandler (RegisterHandlerRequest) returns (RegisterHandlerResponse) {}
 }
+
+message QueryConsumptionRequest {
+  string handler_id = 1;
+}
+
+message QueryConsumptionResponse {
+  oneof Result {
+    ConsumptionDetail Details = 1;
+    Error Error = 2;
+  }
+}
+
+message Error{
+  string Message = 1;
+}
+
+message ConsumptionDetail {
+  uint64 TotalRequestCount = 1;
+  uint64 TotalResponseBytes = 2;
+  uint64 TotalExecutionTimeMicroseconds = 3;
+  uint64 TotalConsumptionByteMilliseconds = 4;
+}
+
+
+
 
 message RegisterHandlerRequest {
   string handler_id = 1;

@@ -102,3 +102,15 @@ Now, i'm not an expert on how to work with Jint, so i might be doing this wrong,
 
 The plan is to inject a fetch function into the javascript runtime. We'll use the `System.Net.Http.HttpClient` to do the actual work.
 Unbelievably, this works! I was expecting to have to do some crazy stuff, but it just works! Jint is really cool!
+
+## 7. Adding a Consumption API
+
+Continuing on the theme of cloning AWS Lambda, lets add a consumption API. This will let us charge the user for the compute time.
+We will be adding this to the control-plane, so we can track the usage of each route handler.
+
+Now to keep things simple, we will only store the aggregate usage for each route handler. Storing high cardinality data requires
+specialized storage solutions, so we'll leave that for later.
+
+Whats neat about this is that the memory consumption can be lower than 1MB for simple scripts and the execution time can be less than 1ms
+So consumption time is to the microsecond and the memory is measured accurate to the byte! Just for fun. Future work could be to add
+a sampling profiler to the runtime to get a better idea of the memory usage over the time of the request.

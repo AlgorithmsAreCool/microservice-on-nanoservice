@@ -1,4 +1,5 @@
 using System.Net;
+using CosmosCompute.Model;
 
 namespace CosmosCompute.Services;
 
@@ -6,11 +7,13 @@ namespace CosmosCompute.Services;
 /// The result of evaluating a javascript function.
 /// </summary>
 [GenerateSerializer, Immutable]
-public record struct EvalResult(HttpStatusCode StatusCode, string? Body);
+public record struct EvalResult(HttpStatusCode StatusCode, string Body);
 
 public interface IJavascriptGrain : IGrainWithStringKey
 {
     public Task Import(string code);
 
     public Task<EvalResult> Execute(string path);
+
+    public Task<DataPlaneConsumptionInfo> GetConsumptionInfo();
 }

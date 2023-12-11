@@ -6,6 +6,9 @@ using Jint.Native.Object;
 using System.Text;
 using System.Text.Json.Nodes;
 using Jint.Runtime.Descriptors;
+using Google.Protobuf.WellKnownTypes;
+using System.Diagnostics;
+using CosmosCompute.Model;
 
 namespace CosmosCompute.Services;
 
@@ -34,7 +37,14 @@ public class JavascriptGrain([PersistentState("state")]  IPersistentState<Javasc
         {
             throw new ApplicationException($"Failed to parse javascript: {ex.Message}");
         }
-        
+    }
+
+    public Task<DataPlaneConsumptionInfo> GetConsumptionInfo()
+    {
+        if (state.State is not JavascriptGrainState stateObj)
+            throw new ApplicationException("State is null");
+
+        return Task.FromResult(stateObj.ConsumptionDetail);
     }
 
     ///<remarks>
@@ -49,38 +59,55 @@ public class JavascriptGrain([PersistentState("state")]  IPersistentState<Javasc
 
     private EvalResult Evaluate(string path)
     {
-        if (state.State is null)
+        if (state.State is not JavascriptGrainState stateObj)
+            return new(HttpStatusCode.NotFound, string.Empty);
+
+        if (stateObj.Code is not string code)
+            return new(HttpStatusCode.NotFound, string.Empty);
+
+        Script ??= ParseScriptOrThrow(code);
+
+        using var engine = new Engine();
+        InjectApi(path, engine);
+
+        var billingClock = Stopwatch.StartNew();
+        var startingMemory = GC.GetAllocatedBytesForCurrentThread();
+
+        var result = engine.Evaluate(Script);
+
+        billingClock.Stop();
+        var endingMemory = GC.GetAllocatedBytesForCurrentThread();
+
+        var evalResult = result.Type switch {
+            Jint.Runtime.Types.String => new EvalResult(HttpStatusCode.OK, result.AsString()),
+
+            _ => new(HttpStatusCode.OK, result.ToString()),
+        };
+
+        var utf8Size = Encoding.UTF8.GetByteCount(evalResult.Body);
+
+        stateObj.ConsumptionDetail = stateObj.ConsumptionDetail.AddRequest(
+            (ulong)utf8Size,
+            billingClock.Elapsed,
+            (ulong)(endingMemory - startingMemory)
+        );
+
+        return evalResult;
+    }
+
+    private static void InjectApi(string path, Engine engine)
+    {
+        engine.SetValue("path", path);
+        engine.SetValue("fetch", (string resource) =>
         {
-            return new (HttpStatusCode.NotFound, null);
-        }
-
-        if (state.State?.Code is string code)
-        {
-            Script ??= ParseScriptOrThrow(state.State.Code);
-
-            using var engine = new Engine();
-            engine.SetValue("path", path);
-            engine.SetValue("fetch", (string resource) => {
-                using var client = new HttpClient();
-                return client.GetStringAsync(resource).Result;
-            });
-
-            var result = engine.Evaluate(state.State.Code);
-
-            return result.Type switch {
-                Jint.Runtime.Types.String => new (HttpStatusCode.OK, result.AsString()),
-
-                _ => new (HttpStatusCode.OK, result.ToString()),
-            };
-        }
-        else
-        {
-            return new (HttpStatusCode.NotFound, null);
-        }
+            using var client = new HttpClient();
+            return client.GetStringAsync(resource).Result;
+        });
     }
 
     public class JavascriptGrainState
     {
+        public DataPlaneConsumptionInfo ConsumptionDetail { get; set; }
         public string? Code { get; set; }
     }
 }
