@@ -44,7 +44,7 @@ public class EndToEndControlPlaneTests : IDisposable
         var response = await controlPlane.RegisterHandler(request, context);
         Assert.True(response.Success);
 
-        var dataPlane = new DataPlaneRouterService(NullLogger<DataPlaneRouterService>.Instance, _cluster.Client);
+        var dataPlane = new DataPlaneRouterService(_cluster.Client);
         var evalResult = await dataPlane.DispatchRoute("test", "test");
 
         Assert.Equal(HttpStatusCode.OK, evalResult.StatusCode);

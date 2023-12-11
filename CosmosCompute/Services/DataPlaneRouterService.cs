@@ -2,7 +2,7 @@ using System.Net;
 
 namespace CosmosCompute.Services;
 
-public class DataPlaneRouterService(ILogger<DataPlaneRouterService> logger, IClusterClient clusterClient)
+public class DataPlaneRouterService(IClusterClient clusterClient)
 {
     /// <summary>
     /// Routes a request to the appropriate handler.
