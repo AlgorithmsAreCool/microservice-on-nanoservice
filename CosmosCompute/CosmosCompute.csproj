@@ -17,6 +17,7 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
     <PackageReference Include="jint" Version="3.0.0-beta-2057" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.4" />
+    <PackageReference Include="system.formats.cbor" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

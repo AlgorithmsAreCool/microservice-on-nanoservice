@@ -1,4 +1,5 @@
 using System.Net;
+using CosmosCompute.Model;
 
 namespace CosmosCompute.Services;
 
@@ -9,12 +10,12 @@ public class DataPlaneRouterService(IClusterClient clusterClient)
     /// </summary>
     public async Task<EvalResult> DispatchRoute(string prefix, string path)
     {
-        if(Helpers.IsValidHandlerId(prefix) is false)
-            return new (HttpStatusCode.BadRequest, "Handler ID contains invalid characters");
+        if(Helpers.IsValidOrganizationName(prefix) is false)
+            return new (HttpStatusCode.BadRequest, "Organization Id contains invalid characters");
 
-        var normalizedHandlerName = Helpers.GetNormalizedHandlerName(prefix);
+        var normalizedOrganizationName = Helpers.GetNormalizedOrganizationName(prefix);
 
-        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedHandlerName);
+        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedOrganizationName);
 
         return await grain.Execute(path);
     }

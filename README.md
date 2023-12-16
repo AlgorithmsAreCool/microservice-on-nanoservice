@@ -169,3 +169,14 @@ or how to evict cold data from memory. All of that is handled by Orleans.
 
 
 This has been a very fun weekend project! I hope you enjoyed reading about it as much as I enjoyed building it!
+
+## 10. So, I said I was done...
+
+I'm hitting my performance goals, I have some confidence in scaling up to a pretty high level of load.
+But now that I'm here, I can see father over the hill towards a real platform
+
+So next i'm going to add some basic history tracking to the script uploads. A minor interesting thing is that
+we use canonical CBOR to generate a sable hash of the script and metadata. This is because I think CBOR is cool.
+
+I also did some renaming and refactoring to make the code a little more readable.
+

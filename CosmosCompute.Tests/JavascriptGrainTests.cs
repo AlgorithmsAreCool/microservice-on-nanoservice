@@ -50,7 +50,7 @@ public class JavascriptGrainTests
         var grain = new JavascriptGrain(state);
 
         //Act
-        await grain.Import(LargeSampleJavascriptSnippet);
+        await grain.Import(LargeSampleJavascriptSnippet, "", "");
         var initialConsumptionInfo = await grain.GetConsumptionInfo();
         for (var i = 0; i < 10; i++)
         {
@@ -76,11 +76,10 @@ public class JavascriptGrainTests
         var grain = new JavascriptGrain(state);
 
         //Act
-        await grain.Import(code);
+        await grain.Import(code, "", "");
         var result = await grain.Execute("test");
 
         //Assert
-        Assert.Equal(code, state.State?.Code);
         Assert.Null(result.Body);
     }
 
@@ -93,11 +92,10 @@ public class JavascriptGrainTests
         var grain = new JavascriptGrain(state);
 
         //Act
-        await grain.Import(code);
+        await grain.Import(code, "", "");
         var result = await grain.Execute("test");
 
         //Assert
-        Assert.Equal(code, state.State?.Code);
         Assert.Null(result.Body);
     }
 
@@ -110,10 +108,13 @@ public class JavascriptGrainTests
         var grain = new JavascriptGrain(state);
 
         //Act
-        await grain.Import(code);
+        await grain.Import(code, "testcommiter", "");
 
         //Assert
-        Assert.Equal(code, state.State?.Code);
+        var lastCommit = state.State.CommitHistory.Last();
+
+        Assert.True(state.State?.CommitHistory.Count != 0);
+        Assert.Equal("testcommiter", lastCommit.Metadata.CommittedBy);
     }
 
     [Fact]
@@ -125,7 +126,7 @@ public class JavascriptGrainTests
         var grain = new JavascriptGrain(state);
 
         //Act / Assert
-        var ex = await Assert.ThrowsAsync<ParserException>(() => grain.Import(code));
+        var ex = await Assert.ThrowsAsync<ParserException>(() => grain.Import(code, "", ""));
     }
 }
 

@@ -1,6 +1,6 @@
 namespace CosmosCompute.Model;
 
-[GenerateSerializer]
+[GenerateSerializer, Immutable]
 public readonly record struct DataPlaneConsumptionInfo
 {
     [Id(0)]

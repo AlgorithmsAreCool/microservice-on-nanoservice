@@ -1,19 +1,12 @@
-using System.Net;
 using CosmosCompute.Model;
 
 namespace CosmosCompute.Services;
 
-/// <summary>
-/// The result of evaluating a javascript function.
-/// </summary>
-[GenerateSerializer, Immutable]
-public record struct EvalResult(HttpStatusCode StatusCode, string Body);
-
 public interface IJavascriptGrain : IGrainWithStringKey
 {
-    public Task Import(string code);
+    public Task Import(string rawScript, string committedBy, string commitMessage);
 
-    public Task<EvalResult> Execute(string path);
+    public ValueTask<EvalResult> Execute(string requestPath);
 
     public Task<DataPlaneConsumptionInfo> GetConsumptionInfo();
 }

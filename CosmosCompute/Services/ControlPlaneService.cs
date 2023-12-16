@@ -6,20 +6,18 @@ namespace CosmosCompute.Services;
 public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterClient clusterClient)
     : ControlPlane.ControlPlaneBase
 {
-    public override async Task<QueryConsumptionResponse> QueryUsage(QueryConsumptionRequest request, ServerCallContext context)
+    public override async Task<GetCurrentConsumptionResponse> GetCurrentConsumption(GetCurrentConsumptionRequest request, ServerCallContext context)
     {
-        if (Helpers.IsValidHandlerId(request.HandlerId) is false)
+        if (Helpers.IsValidOrganizationName(request.OrganizationId) is false)
         {
-            return new QueryConsumptionResponse
-            {
-                Error = new Error
-                {
-                    Message = "Handler ID contains invalid characters"
+            return new GetCurrentConsumptionResponse {
+                Error = new Error {
+                    Message = "Organization ID contains invalid characters"
                 }
             };
         }
 
-        var normalizedHandlerName = Helpers.GetNormalizedHandlerName(request.HandlerId);
+        var normalizedHandlerName = Helpers.GetNormalizedOrganizationName(request.OrganizationId);
 
         var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedHandlerName);
 
@@ -27,8 +25,7 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
         {
             var consumption = await grain.GetConsumptionInfo();
 
-            return new QueryConsumptionResponse
-            {
+            return new GetCurrentConsumptionResponse {
                 Details = new ConsumptionDetail {
                     TotalRequestCount = consumption.TotalRequestCount,
                     TotalExecutionTimeMicroseconds = ulong.CreateTruncating(consumption.TotalExecutionTime.TotalMicroseconds),
@@ -39,12 +36,10 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to query consumption for handler {HandlerId}", request.HandlerId);
+            logger.LogError(ex, "Failed to query consumption for organization {OrganizationId}", request.OrganizationId);
 
-            return new QueryConsumptionResponse
-            {
-                Error = new Error
-                {
+            return new GetCurrentConsumptionResponse {
+                Error = new Error {
                     Message = ex.Message
                 }
             };
@@ -55,33 +50,42 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
     /// <summary>
     /// Registers a new handler with the control plane.
     /// </summary>
-    public override async Task<RegisterHandlerResponse> RegisterHandler(RegisterHandlerRequest request, ServerCallContext context)
+    public override async Task<CommitRouteHandlerResponse> CommitRouteHandler(CommitRouteHandlerRequest request, ServerCallContext context)
     {
-        if (Helpers.IsValidHandlerId(request.HandlerId) is false)
+        if(request.HandlerScriptLanguage != RouteHandlerLanguage.Javascript)
         {
-            return new RegisterHandlerResponse {
+            return new CommitRouteHandlerResponse {
                 Success = false,
-                Error = "Handler ID contains invalid characters"
+                Error = "Only Javascript is current supported as a script language"
             };
         }
 
-        var normalizedHandlerName = Helpers.GetNormalizedHandlerName(request.HandlerId);
+        if (Helpers.IsValidOrganizationName(request.OrganizationId) is false)
+        {
+            return new CommitRouteHandlerResponse {
+                Success = false,
+                Error = "Organization ID contains invalid characters"
+            };
+        }
 
-        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedHandlerName);
+        var normalizedOrganizationName = Helpers.GetNormalizedOrganizationName(request.OrganizationId);
+
+        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedOrganizationName);
 
         try
         {
-            await grain.Import(request.HandlerJsBody);
+            await grain.Import(request.HandlerScriptBody, request.Committer, request.CommitMessage);
 
-            return new RegisterHandlerResponse {
+            return new CommitRouteHandlerResponse {
                 Success = true
             };
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to register handler {HandlerId}", request.HandlerId);
+            logger.LogError(ex, "Failed to register handler {OrganizationId} {Route}", request.OrganizationId, request.Route);
 
-            return new RegisterHandlerResponse {
+            return new CommitRouteHandlerResponse
+            {
                 Success = false,
                 Error = ex.Message
             };

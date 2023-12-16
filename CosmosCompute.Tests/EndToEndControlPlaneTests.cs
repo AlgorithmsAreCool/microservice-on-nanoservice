@@ -35,13 +35,17 @@ public class EndToEndControlPlaneTests : IDisposable
 
         //Arrange
         var controlPlane = new ControlPlaneService(NullLogger<ControlPlaneService>.Instance, _cluster.Client);
-        var request = new RegisterHandlerRequest {
-            HandlerId = "test",
-            HandlerJsBody = "'hello world';"
+        var request = new CommitRouteHandlerRequest {
+            OrganizationId = "test",
+            HandlerScriptBody = "'hello world';",
+            HandlerScriptLanguage = RouteHandlerLanguage.Javascript,
+            Committer = "test client",
+            Route = "/test",
+            CommitMessage = "test commit"
         };
 
         //Act / Assert
-        var response = await controlPlane.RegisterHandler(request, context);
+        var response = await controlPlane.CommitRouteHandler(request, context);
         Assert.True(response.Success);
 
         var dataPlane = new DataPlaneRouterService(_cluster.Client);
@@ -58,14 +62,17 @@ public class EndToEndControlPlaneTests : IDisposable
 
         //Arrange
         var controlPlane = new ControlPlaneService(NullLogger<ControlPlaneService>.Instance, _cluster.Client);
-        var request = new RegisterHandlerRequest
-        {
-            HandlerId = "test",
-            HandlerJsBody = "'hello world';"
+        var request = new CommitRouteHandlerRequest {
+            OrganizationId = "test",
+            HandlerScriptBody = "'hello world';",
+            HandlerScriptLanguage = RouteHandlerLanguage.Javascript,
+            Committer = "test client",
+            Route = "/test",
+            CommitMessage = "test commit"
         };
 
         //Act
-        var response = await controlPlane.RegisterHandler(request, context);
+        var response = await controlPlane.CommitRouteHandler(request, context);
 
         //Assert
 
@@ -80,14 +87,18 @@ public class EndToEndControlPlaneTests : IDisposable
         NullLogger<ControlPlaneService> logger = new();
         //Arrange
         var controlPlane = new ControlPlaneService(logger, _cluster.Client);
-        var request = new RegisterHandlerRequest
+        var request = new CommitRouteHandlerRequest
         {
-            HandlerId = "invalid id^%$#",
-            HandlerJsBody = "console.log('hello world');"
+            OrganizationId = "invalid id^%$#",
+            HandlerScriptBody = "'hello world';",
+            HandlerScriptLanguage = RouteHandlerLanguage.Javascript,
+            Committer = "test client",
+            Route = "/test",
+            CommitMessage = "test commit"
         };
 
         //Act
-        var response = await controlPlane.RegisterHandler(request, context);
+        var response = await controlPlane.CommitRouteHandler(request, context);
 
         //Assert
         Assert.False(response.Success);

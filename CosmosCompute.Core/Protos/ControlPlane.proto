@@ -5,15 +5,21 @@ option csharp_namespace = "CosmosCompute";
 package greet;
 
 service ControlPlane {
-  rpc QueryUsage (QueryConsumptionRequest) returns (QueryConsumptionResponse) {}
-  rpc RegisterHandler (RegisterHandlerRequest) returns (RegisterHandlerResponse) {}
+  rpc GetCurrentConsumption (GetCurrentConsumptionRequest) returns (GetCurrentConsumptionResponse) {}
+  rpc CommitRouteHandler (CommitRouteHandlerRequest) returns (CommitRouteHandlerResponse) {}
 }
 
-message QueryConsumptionRequest {
-  string handler_id = 1;
+enum RouteHandlerLanguage {
+  ROUTE_HANDLER_Invalid = 0;
+  Javascript = 1;
 }
 
-message QueryConsumptionResponse {
+
+message GetCurrentConsumptionRequest {
+  string OrganizationId = 1;
+}
+
+message GetCurrentConsumptionResponse {
   oneof Result {
     ConsumptionDetail Details = 1;
     Error Error = 2;
@@ -34,13 +40,19 @@ message ConsumptionDetail {
 
 
 
-message RegisterHandlerRequest {
-  string handler_id = 1;
-  string handler_route = 2;
-  string handler_js_body = 3;
+message CommitRouteHandlerRequest {
+  string OrganizationId = 1;
+
+  string Committer = 2;
+  string CommitMessage = 3;
+
+  string Route = 4;
+
+  RouteHandlerLanguage HandlerScriptLanguage = 5;
+  string HandlerScriptBody = 6;
 }
 
-message RegisterHandlerResponse {
+message CommitRouteHandlerResponse {
   bool Success = 1;
   string Error = 2;
 }

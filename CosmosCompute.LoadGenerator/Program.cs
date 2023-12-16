@@ -27,13 +27,16 @@ var controlPlanChannel = GrpcChannel.ForAddress("http://localhost:5000", new Grp
 var controlPlaneClient = new ControlPlane.ControlPlaneClient(controlPlanChannel);
 
 
-var registerHandler = new RegisterHandlerRequest {
-    HandlerId = "echo",
-    HandlerJsBody = sampleHtml,
-    HandlerRoute = "echo"
+var registerHandler = new CommitRouteHandlerRequest {
+    OrganizationId = "test",
+    CommitMessage = "Test commit",
+    HandlerScriptLanguage = RouteHandlerLanguage.Javascript,
+    Route = "/test",
+    HandlerScriptBody = sampleHtml,
+    Committer = "test client"
 };
 
-var registrationResponse = await controlPlaneClient.RegisterHandlerAsync(registerHandler);
+var registrationResponse = await controlPlaneClient.CommitRouteHandlerAsync(registerHandler);
 
 Console.WriteLine($"Registration Response: {registrationResponse.Success} {registrationResponse.Error}");
 
