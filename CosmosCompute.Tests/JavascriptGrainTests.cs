@@ -1,12 +1,16 @@
 namespace CosmosCompute.Tests;
 
 using CommunityToolkit.Diagnostics;
+using CosmosCompute.Interfaces.Grains;
 using CosmosCompute.Services;
-
+using CosmosCompute.Services.Javascript;
 using Esprima;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Orleans;
 using Orleans.Runtime;
+using Orleans.TestingHost;
 
 public class JavascriptGrainTests
 {
@@ -41,16 +45,33 @@ public class JavascriptGrainTests
     main();
     ";
 
+    public JavascriptGrainTests()
+    {
+        var testClusterBuilder = new TestClusterBuilder
+        {
+            Options = {
+                InitialSilosCount = 1,
+            }
+        };
+
+        testClusterBuilder.AddSiloBuilderConfigurator<TestSiloConfigurator>();
+
+        _cluster = testClusterBuilder.Build();
+        _cluster.Deploy();
+    }
+
+    private readonly TestCluster _cluster;
+
+
     [Fact]
     public async Task ConsumptionInfoIsUpdated()
     {
         //Arrange
-        
-        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
-        var grain = new JavascriptGrain(state);
+        var grain = _cluster.GrainFactory.GetGrain<IRouteHandlerGrain>(string.Empty);
 
         //Act
-        await grain.Import(LargeSampleJavascriptSnippet, "", "");
+        await grain.UpdateHandlerScript(language: Model.ScriptLanguage.Javascript, LargeSampleJavascriptSnippet, "", "");
+
         var initialConsumptionInfo = await grain.GetConsumptionInfo();
         for (var i = 0; i < 10; i++)
         {
@@ -72,15 +93,14 @@ public class JavascriptGrainTests
     {
         //Arrange
         var code = "fetch('https://example.org/')";
-        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
-        var grain = new JavascriptGrain(state);
+        var grain = _cluster.GrainFactory.GetGrain<IRouteHandlerGrain>(string.Empty);
 
         //Act
-        await grain.Import(code, "", "");
+        await grain.UpdateHandlerScript(Model.ScriptLanguage.Javascript, code, "", "");
         var result = await grain.Execute("test");
 
         //Assert
-        Assert.Null(result.Body);
+        Guard.IsNotNullOrWhiteSpace(result.Body);
     }
 
     [Fact]
@@ -88,15 +108,14 @@ public class JavascriptGrainTests
     {
         //Arrange
         var code = "2 * 2";
-        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
-        var grain = new JavascriptGrain(state);
+        var grain = _cluster.GrainFactory.GetGrain<IRouteHandlerGrain>(string.Empty);
 
         //Act
-        await grain.Import(code, "", "");
+        await grain.UpdateHandlerScript(Model.ScriptLanguage.Javascript, code, "", "");
         var result = await grain.Execute("test");
 
         //Assert
-        Assert.Null(result.Body);
+        Guard.IsEqualTo(result.Body, "4");
     }
 
     [Fact]
@@ -104,16 +123,14 @@ public class JavascriptGrainTests
     {
         //Arrange
         var code = "console.log('hello world');";
-        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
-        var grain = new JavascriptGrain(state);
+        var grain = _cluster.GrainFactory.GetGrain<IRouteHandlerGrain>(string.Empty);
 
         //Act
-        await grain.Import(code, "testcommiter", "");
+        await grain.UpdateHandlerScript(Model.ScriptLanguage.Javascript, code, "testcommiter", "");
 
         //Assert
-        var lastCommit = state.State.CommitHistory.Last();
+        var lastCommit = await grain.GetScriptSummary();
 
-        Assert.True(state.State?.CommitHistory.Count != 0);
         Assert.Equal("testcommiter", lastCommit.Metadata.CommittedBy);
     }
 
@@ -122,35 +139,20 @@ public class JavascriptGrainTests
     {
         //Arrange
         var code = "console.log('hello";
-        var state = new MockStorage<JavascriptGrain.JavascriptGrainState?>();
-        var grain = new JavascriptGrain(state);
+        var grain = _cluster.GrainFactory.GetGrain<IRouteHandlerGrain>(string.Empty);
 
         //Act / Assert
-        var ex = await Assert.ThrowsAsync<ParserException>(() => grain.Import(code, "", ""));
-    }
-}
-
-public class MockStorage<T> : IPersistentState<T?>
-{
-    public T? State { get; set; }
-    public string? Etag { get; }
-    public bool RecordExists { get; private set; }
-
-    public Task ClearStateAsync()
-    {
-        RecordExists = false;
-        State = default;
-        return Task.CompletedTask;
+        var ex = await Assert.ThrowsAnyAsync<Exception>(() => grain.UpdateHandlerScript(Model.ScriptLanguage.Javascript, code, "", ""));
     }
 
-    public Task ReadStateAsync()
+    public class TestSiloConfigurator : ISiloConfigurator
     {
-        return Task.CompletedTask;
-    }
-
-    public Task WriteStateAsync()
-    {
-        RecordExists = true;
-        return Task.CompletedTask;
+        public void Configure(ISiloBuilder siloBuilder)
+        {
+            siloBuilder.AddMemoryGrainStorageAsDefault();
+            siloBuilder.Services.AddSingleton(TimeProvider.System);
+            siloBuilder.Services.AddSingleton<JavascriptRuntimeFactory>();
+            siloBuilder.Services.AddSingleton<ScriptCompilerFactory>();
+        }
     }
 }

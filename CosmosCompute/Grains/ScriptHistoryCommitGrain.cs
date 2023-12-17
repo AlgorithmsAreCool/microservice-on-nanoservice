@@ -1,16 +1,16 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
-
-using CosmosCompute.Grains.Interfaces;
+using CosmosCompute.Interfaces.Grains;
 using CosmosCompute.Model;
 using Orleans.Runtime;
 
 namespace CosmosCompute.Services;
 
-public class ScriptHistoryCommitGrain([PersistentState("state")] IPersistentState<HistoryCommit?> state) : Grain, IScriptHistoryCommitGrain
+public class ScriptHistoryCommitGrain([PersistentState("state")] IPersistentState<ScriptHistoryCommitGrain.GrainState?> state) : Grain, IScriptHistoryCommitGrain
 {
     public Task<HistoryCommit?> GetCommit()
     {
-        if (state.State is HistoryCommit commit)
+        if (state is { RecordExists: true, State.Commit: var commit})
         {
             return Task.FromResult<HistoryCommit?>(commit);
         }
@@ -27,7 +27,12 @@ public class ScriptHistoryCommitGrain([PersistentState("state")] IPersistentStat
         if (localKey != hash)
             throw new InvalidOperationException();
 
-        state.State = commit;
+        state.State = new GrainState { Commit = commit };
         return state.WriteStateAsync();
+    }
+
+    public class GrainState
+    {
+        public HistoryCommit Commit { get; set; }
     }
 }

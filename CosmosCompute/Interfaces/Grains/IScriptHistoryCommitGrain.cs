@@ -1,7 +1,7 @@
 using System.Text;
 using CosmosCompute.Model;
 
-namespace CosmosCompute.Grains.Interfaces;
+namespace CosmosCompute.Interfaces.Grains;
 
 public interface IScriptHistoryCommitGrain : IGrainWithStringKey
 {

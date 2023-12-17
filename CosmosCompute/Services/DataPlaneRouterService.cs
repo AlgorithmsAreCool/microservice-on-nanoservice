@@ -1,4 +1,5 @@
 using System.Net;
+using CosmosCompute.Interfaces.Grains;
 using CosmosCompute.Model;
 
 namespace CosmosCompute.Services;
@@ -15,7 +16,7 @@ public class DataPlaneRouterService(IClusterClient clusterClient)
 
         var normalizedOrganizationName = Helpers.GetNormalizedOrganizationName(prefix);
 
-        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedOrganizationName);
+        var grain = clusterClient.GetGrain<IRouteHandlerGrain>(normalizedOrganizationName);
 
         return await grain.Execute(path);
     }

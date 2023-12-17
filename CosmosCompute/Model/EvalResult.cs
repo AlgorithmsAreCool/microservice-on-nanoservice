@@ -6,4 +6,4 @@ namespace CosmosCompute.Model;
 /// The result of evaluating a javascript function.
 /// </summary>
 [GenerateSerializer, Immutable]
-public record struct EvalResult(HttpStatusCode StatusCode, string Body);
+public readonly record struct EvalResult(HttpStatusCode StatusCode, string Body);

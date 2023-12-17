@@ -6,7 +6,7 @@ namespace CosmosCompute.Model;
 public readonly record struct HistoryCommitReference(string Base64CommitHash);
 
 [GenerateSerializer, Immutable]
-public readonly record struct PersistedScript(SemanticVersion ScriptApiVersion, string ScriptBody);
+public readonly record struct PersistedScript(ScriptLanguage Language, SemanticVersion ScriptApiVersion, string ScriptBody);
 
 [GenerateSerializer, Immutable]
 public readonly record struct HistoryCommitMetadata(string CommittedBy, string Message, DateTimeOffset CommitDate);

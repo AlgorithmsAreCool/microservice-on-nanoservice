@@ -1,5 +1,8 @@
 using Grpc.Core;
 using CosmosCompute;
+using CosmosCompute.Model;
+using System.Security.Cryptography;
+using CosmosCompute.Interfaces.Grains;
 
 namespace CosmosCompute.Services;
 
@@ -19,7 +22,7 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
 
         var normalizedHandlerName = Helpers.GetNormalizedOrganizationName(request.OrganizationId);
 
-        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedHandlerName);
+        var grain = clusterClient.GetGrain<IRouteHandlerGrain>(normalizedHandlerName);
 
         try
         {
@@ -52,13 +55,11 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
     /// </summary>
     public override async Task<CommitRouteHandlerResponse> CommitRouteHandler(CommitRouteHandlerRequest request, ServerCallContext context)
     {
-        if(request.HandlerScriptLanguage != RouteHandlerLanguage.Javascript)
-        {
-            return new CommitRouteHandlerResponse {
-                Success = false,
-                Error = "Only Javascript is current supported as a script language"
-            };
-        }
+        var language = request.HandlerScriptLanguage switch {
+            RouteHandlerLanguage.Javascript => ScriptLanguage.Javascript,
+
+            _ => default
+        };
 
         if (Helpers.IsValidOrganizationName(request.OrganizationId) is false)
         {
@@ -70,11 +71,11 @@ public class ControlPlaneService(ILogger<ControlPlaneService> logger, IClusterCl
 
         var normalizedOrganizationName = Helpers.GetNormalizedOrganizationName(request.OrganizationId);
 
-        var grain = clusterClient.GetGrain<IJavascriptGrain>(normalizedOrganizationName);
+        var grain = clusterClient.GetGrain<IRouteHandlerGrain>(normalizedOrganizationName);
 
         try
         {
-            await grain.Import(request.HandlerScriptBody, request.Committer, request.CommitMessage);
+            await grain.UpdateHandlerScript(language, request.HandlerScriptBody, request.Committer, request.CommitMessage);
 
             return new CommitRouteHandlerResponse {
                 Success = true

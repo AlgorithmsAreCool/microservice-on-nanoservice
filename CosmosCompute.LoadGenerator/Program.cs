@@ -96,7 +96,7 @@ async Task WorkThread(int requestsPerThread, Totals totals)
         int errorCounter = 0;
         for (int j = 0; j < requestsPerThread; j++)
         {
-            var response = await dataplaneClient.GetAsync("http://localhost:5000/app/echo/echo");
+            var response = await dataplaneClient.GetAsync("http://localhost:5000/app/test/test");
             var responseString = await response.Content.ReadAsStringAsync();
             
             if (response.IsSuccessStatusCode)

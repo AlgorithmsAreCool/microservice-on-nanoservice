@@ -180,3 +180,13 @@ we use canonical CBOR to generate a sable hash of the script and metadata. This 
 
 I also did some renaming and refactoring to make the code a little more readable.
 
+## 11. A new language 
+
+I'm adding support for Liquid templates. This is a very simple template language that can be used to generate HTML
+and other text based formats. This can be more convenient than writing raw javascript for some use cases. .NET has 
+several great high performance templating libraries, but I'm going to Fluid because it has gobs of features and it 
+is quite fast.
+
+To do this, we need to generalize some concepts in the system that are currently quite javascript specific.
+
+NOTE: This commit took me WAY too long to get right. I had a lot of design churn and I was trying to do too much at once. :(

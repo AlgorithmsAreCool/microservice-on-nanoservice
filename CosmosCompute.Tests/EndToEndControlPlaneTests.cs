@@ -2,6 +2,7 @@ namespace CosmosCompute.Tests;
 
 using System.Net;
 using CosmosCompute.Services;
+using CosmosCompute.Services.Javascript;
 using Grpc.Core;
 using Grpc.Core.Testing;
 using Microsoft.Extensions.Configuration;
@@ -102,7 +103,7 @@ public class EndToEndControlPlaneTests : IDisposable
 
         //Assert
         Assert.False(response.Success);
-        Assert.Equal("Handler ID contains invalid characters", response.Error);
+        Assert.Equal("Organization ID contains invalid characters", response.Error);
     }
 
     private static ServerCallContext GetServerCallContext()
@@ -132,7 +133,9 @@ public class EndToEndControlPlaneTests : IDisposable
         public void Configure(ISiloBuilder siloBuilder)
         {
             siloBuilder.AddMemoryGrainStorageAsDefault();
+            siloBuilder.Services.AddSingleton(TimeProvider.System);
+            siloBuilder.Services.AddSingleton<JavascriptRuntimeFactory>();
+            siloBuilder.Services.AddSingleton<ScriptCompilerFactory>();
         }
     }
-
 }
